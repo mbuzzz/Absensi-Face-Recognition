@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="main-title mb-4">{{ title }}</h1>
+
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card bg-dark border-secondary shadow">
+            <div class="card-body">
+                <form method="POST" novalidate>
+                    {{ form.hidden_tag() }}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            {{ form.username.label(class="form-label") }}
+                            {{ form.username(class="form-control") }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.email.label(class="form-label") }}
+                            {{ form.email(class="form-control") }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.role.label(class="form-label") }}
+                            {{ form.role(class="form-select") }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.kelas_asuhan.label(class="form-label") }}
+                            {{ form.kelas_asuhan(class="form-select") }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.password.label(class="form-label") }}
+                            {{ form.password(class="form-control") }}
+                            {% if user %}
+                            <div class="form-text">Biarkan kosong jika tidak ingin mengubah password.</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.password2.label(class="form-label") }}
+                            {{ form.password2(class="form-control") }}
+                        </div>
+                    </div>
+                    <hr class="border-secondary">
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{{ url_for('main.crud_user') }}" class="btn btn-secondary">Batal</a>
+                        {{ form.submit(class="btn btn-success") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="main-title mb-0">Manajemen Data Siswa</h1>
+    <a href="{{ url_for('main.tambah_siswa') }}" class="btn btn-success"><i class="bi bi-plus-circle-fill"></i> Tambah Siswa Baru</a>
+</div>
+
+<div class="card bg-dark border-secondary shadow">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-dark table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Foto</th>
+                        <th>NIS</th>
+                        <th>Nama</th>
+                        <th>Kelas</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for siswa in siswas %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>
+                            <img src="{{ url_for('static', filename='uploads/siswa_photos/' + siswa.foto_path) if siswa.foto_path else 'https://placehold.co/60x60/000000/FFFFFF?text=N/A' }}" 
+                                 alt="Foto {{ siswa.nama }}" class="rounded" width="60" height="60" style="object-fit: cover;">
+                        </td>
+                        <td>{{ siswa.nis }}</td>
+                        <td>{{ siswa.nama }}</td>
+                        <td>{{ siswa.kelas.nama_kelas }}</td>
+                        <td>
+                            <a href="{{ url_for('main.edit_siswa', id=siswa.id) }}" class="btn btn-sm btn-primary" title="Edit"><i class="bi bi-pencil-square"></i></a>
+                            <form action="{{ url_for('main.hapus_siswa', id=siswa.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data siswa ini?');">
+                                <button type="submit" class="btn btn-sm btn-danger" title="Hapus"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center">Belum ada data siswa. Silakan tambahkan data baru.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

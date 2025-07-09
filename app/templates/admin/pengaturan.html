@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="main-title mb-4">Pengaturan Aplikasi</h1>
+
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-sliders"></i> Pengaturan Umum & Identitas
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data" novalidate>
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.nama_aplikasi.label(class="form-label") }}
+                        {{ form.nama_aplikasi(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.nama_sekolah.label(class="form-label") }}
+                        {{ form.nama_sekolah(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.logo_aplikasi.label(class="form-label") }}
+                        {% if logo_path %}
+                            <p class="text-muted small">Logo saat ini: <img src="{{ url_for('static', filename=logo_path) }}" alt="Logo Aplikasi" height="40"></p>
+                        {% endif %}
+                        {{ form.logo_aplikasi(class="form-control") }}
+                    </div>
+                    <hr>
+                    <h5 class="mb-3">Pengaturan Waktu</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            {{ form.waktu_terlambat.label(class="form-label") }}
+                            {{ form.waktu_terlambat(class="form-control") }}
+                            <div class="form-text">Siswa yang absen setelah jam ini akan ditandai "Terlambat".</div>
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.waktu_alpha.label(class="form-label") }}
+                            {{ form.waktu_alpha(class="form-control") }}
+                            <div class="form-text">Siswa yang belum absen setelah jam ini akan ditandai "Alpha" secara otomatis.</div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-end">
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

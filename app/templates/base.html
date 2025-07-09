@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title }} - {{ nama_aplikasi }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div id="wrapper">
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <div class="sidebar-heading">
+                <a class="text-decoration-none main-title" href="{{ url_for('main.dashboard') }}">
+                    {% if logo_path %}
+                        <img src="{{ url_for('static', filename=logo_path) }}" alt="Logo" class="logo">
+                    {% else %}
+                        <i class="bi bi-camera-reels-fill"></i>
+                    {% endif %}
+                    <span>{{ nama_aplikasi }}</span>
+                </a>
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="{{ url_for('main.dashboard') }}" class="list-group-item list-group-item-action">
+                    <i class="bi bi-grid-1x2-fill"></i>Dashboard
+                </a>
+                <a href="{{ url_for('main.index') }}" class="list-group-item list-group-item-action">
+                    <i class="bi bi-camera-video"></i>Live Absen
+                </a>
+                
+                {% if current_user.is_authenticated and current_user.role in ['Admin', 'Wali Kelas', 'BK'] %}
+                <div class="list-group-item sidebar-dropdown dropdown">
+                    <a href="#" class="dropdown-toggle text-decoration-none" data-bs-toggle="dropdown">
+                        <i class="bi bi-journal-check"></i>Laporan
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="{{ url_for('main.edit_kehadiran_harian') }}">Edit Kehadiran Harian</a>
+                        <a class="dropdown-item" href="{{ url_for('main.laporan_log') }}">Log Jangka Waktu</a>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if current_user.is_authenticated and current_user.role == 'Admin' %}
+                <div class="list-group-item sidebar-dropdown dropdown">
+                    <a href="#" class="dropdown-toggle text-decoration-none" data-bs-toggle="dropdown">
+                        <i class="bi bi-database-fill-gear"></i>Manajemen Data
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="{{ url_for('main.crud_siswa') }}">Siswa</a>
+                        <a class="dropdown-item" href="{{ url_for('main.crud_kelas') }}">Kelas</a>
+                        <a class="dropdown-item" href="{{ url_for('main.crud_user') }}">Pengguna</a>
+                    </div>
+                </div>
+                <a href="{{ url_for('main.pengaturan') }}" class="list-group-item list-group-item-action">
+                    <i class="bi bi-sliders"></i>Pengaturan
+                </a>
+                {% elif current_user.is_authenticated and current_user.role in ['Wali Kelas', 'BK'] %}
+                <a href="{{ url_for('main.crud_siswa') }}" class="list-group-item list-group-item-action">
+                    <i class="bi bi-people-fill"></i>Data Siswa
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Page Content Wrapper-->
+        <div id="page-content-wrapper">
+            <!-- Topbar -->
+            <nav class="navbar navbar-expand-lg navbar-light topbar">
+                <div class="container-fluid">
+                    <button class="btn btn-link" id="sidebarToggle"><i class="bi bi-list"></i></button>
+                    <ul class="navbar-nav ms-auto">
+                        {% if current_user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-circle me-2"></i>{{ current_user.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="{{ url_for('main.logout') }}"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+                            </ul>
+                        </li>
+                        {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.login') }}"><i class="bi bi-box-arrow-in-right me-2"></i>Login</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </nav>
+            
+            <!-- Main Content -->
+            <div class="content-fluid">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                {% block content %}{% endblock %}
+            </div>
+
+            <footer class="footer mt-auto py-3 bg-white">
+              <div class="container text-center">
+                <span class="text-muted">Created by Rifqy Iza Fahrizal dan Yanuar &copy; {{ now().year }}</span>
+              </div>
+            </footer>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

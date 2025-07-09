@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1 class="main-title mb-4">Edit Kehadiran Harian</h1>
+
+    <!-- Filter Form -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header d-flex align-items-center">
+            <i class="bi bi-calendar-check-fill me-2"></i>
+            <h4>Filter Data Harian</h4>
+        </div>
+        <div class="card-body">
+            <form method="POST" class="row g-3 align-items-end">
+                {{ form.hidden_tag() }}
+                <div class="col-md-5">
+                    {{ form.kelas.label(class="form-label") }}
+                    {{ form.kelas(class="form-select") }}
+                </div>
+                <div class="col-md-5">
+                    {{ form.tanggal.label(class="form-label") }}
+                    {{ form.tanggal(class="form-control", value=tanggal.strftime('%Y-%m-%d')) }}
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" name="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search"></i> Tampilkan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Rekapitulasi -->
+    <div class="row g-3 mb-4">
+        <div class="col-lg col-md-4 col-6">
+            <div class="card text-center p-2">
+                <h5 class="mb-0 text-success">{{ rekap.Hadir }}</h5>
+                <small class="text-muted">Hadir</small>
+            </div>
+        </div>
+        <div class="col-lg col-md-4 col-6">
+            <div class="card text-center p-2">
+                <h5 class="mb-0 text-warning">{{ rekap.Terlambat }}</h5>
+                <small class="text-muted">Terlambat</small>
+            </div>
+        </div>
+        <div class="col-lg col-md-4 col-6">
+            <div class="card text-center p-2">
+                <h5 class="mb-0 text-info">{{ rekap.Izin }}</h5>
+                <small class="text-muted">Izin</small>
+            </div>
+        </div>
+        <div class="col-lg col-md-4 col-6">
+            <div class="card text-center p-2">
+                <h5 class="mb-0 text-secondary">{{ rekap.Sakit }}</h5>
+                <small class="text-muted">Sakit</small>
+            </div>
+        </div>
+        <div class="col-lg col-md-4 col-6">
+            <div class="card text-center p-2">
+                <h5 class="mb-0 text-danger">{{ rekap.Alpha }}</h5>
+                <small class="text-muted">Alpha</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabel Edit Kehadiran -->
+    <div class="card shadow-sm">
+        <div class="card-header d-flex align-items-center">
+            <i class="bi bi-pencil-square me-2"></i>
+            <h4>Daftar Kehadiran Siswa - {{ tanggal.strftime('%d %B %Y') }}</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Nama Siswa</th>
+                            <th>Kelas</th>
+                            <th>Status Saat Ini</th>
+                            <th style="width: 40%;">Update Kehadiran</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for absen in laporan %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ absen.siswa.nama }}</td>
+                            <td>{{ absen.siswa.kelas.nama_kelas }}</td>
+                            <td>
+                                {% set status_class = 'badge ' + ('bg-success-subtle text-success-emphasis' if absen.status == 'Hadir' else 'bg-warning-subtle text-warning-emphasis' if absen.status in ['Izin', 'Sakit', 'Terlambat'] else 'bg-danger-subtle text-danger-emphasis') %}
+                                <span class="{{ status_class }}">{{ absen.status }}</span>
+                            </td>
+                            <td>
+                                <form action="{{ url_for('main.update_kehadiran', siswa_id=absen.siswa.id) }}" method="POST">
+                                    {{ update_form.hidden_tag() }}
+                                    <input type="hidden" name="tanggal" value="{{ tanggal.strftime('%Y-%m-%d') }}">
+                                    <input type="hidden" name="kelas_id" value="{{ form.kelas.data.id if form.kelas.data else '' }}">
+                                    <div class="input-group">
+                                        {{ update_form.status(class="form-select form-select-sm", value=absen.status) }}
+                                        {{ update_form.keterangan(class="form-control form-control-sm", placeholder="Keterangan...", value=absen.keterangan or '') }}
+                                        <button type="submit" class="btn btn-sm btn-primary">
+                                            <i class="bi bi-check-lg"></i> Update
+                                        </button>
+                                    </div>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-4 text-muted">
+                                Tidak ada data siswa yang sesuai dengan filter yang dipilih.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

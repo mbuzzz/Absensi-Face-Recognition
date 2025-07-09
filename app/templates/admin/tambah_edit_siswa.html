@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="main-title mb-4">{{ title }}</h1>
+
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card bg-dark border-secondary shadow">
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data" novalidate>
+                    {{ form.hidden_tag() }}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            {{ form.nis.label(class="form-label") }}
+                            {{ form.nis(class="form-control") }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.nama.label(class="form-label") }}
+                            {{ form.nama(class="form-control") }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.kelas.label(class="form-label") }}
+                            {{ form.kelas(class="form-select") }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.nomor_orang_tua.label(class="form-label") }}
+                            {{ form.nomor_orang_tua(class="form-control") }}
+                        </div>
+                        <div class="col-12">
+                            {{ form.foto.label(class="form-label") }}
+                            {% if siswa and siswa.foto_path %}
+                                <p class="text-muted small">Foto saat ini: {{ siswa.foto_path }}. Biarkan kosong jika tidak ingin mengubah.</p>
+                            {% endif %}
+                            {{ form.foto(class="form-control") }}
+                            {% for error in form.foto.errors %}
+                                <span class="text-danger small">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <hr class="border-secondary">
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{{ url_for('main.crud_siswa') }}" class="btn btn-secondary">Batal</a>
+                        {{ form.submit(class="btn btn-success") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

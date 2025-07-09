@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 offset-lg-1 text-center">
+        <h1 class="main-title mb-4">LIVE ABSENSI WAJAH</h1>
+        
+        {% if current_user.is_authenticated %}
+        <div class="card bg-dark border-secondary mb-4 shadow">
+            <div class="card-header">Kontrol Auto Absen</div>
+            <div class="card-body d-flex justify-content-center align-items-center flex-wrap gap-3">
+                <button id="startButton" class="btn btn-success btn-lg shadow-lg"><i class="bi bi-play-circle-fill"></i> Mulai</button>
+                <button id="stopButton" class="btn btn-danger btn-lg shadow-lg" disabled><i class="bi bi-stop-circle-fill"></i> Stop</button>
+                <div class="status-indicator ms-3">
+                    Status: <span id="statusText" class="badge bg-secondary fs-6">Tidak Aktif</span>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="alert alert-warning shadow">
+            <i class="bi bi-exclamation-triangle-fill"></i> Silakan <a href="{{ url_for('main.login') }}" class="alert-link">Login</a> sebagai Petugas untuk mengaktifkan fitur absensi.
+        </div>
+        {% endif %}
+
+        <div class="camera-feed-container border border-success border-3 shadow-lg">
+            <img src="{{ url_for('main.video_feed') }}" width="100%" alt="[Tampilan Kamera Langsung]">
+        </div>
+        <p class="mt-3 text-muted">Arahkan wajah ke kamera untuk melakukan absensi setelah mode auto diaktifkan.</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const startButton = document.getElementById('startButton');
+    const stopButton = document.getElementById('stopButton');
+    const statusText = document.getElementById('statusText');
+
+    if (!startButton) return;
+
+    function updateStatus() {
+        fetch("{{ url_for('main.absen_status') }}")
+            .then(response => response.json())
+            .then(data => {
+                if (data.aktif) {
+                    statusText.textContent = 'Aktif';
+                    statusText.className = 'badge bg-success fs-6';
+                    startButton.disabled = true;
+                    stopButton.disabled = false;
+                } else {
+                    statusText.textContent = 'Tidak Aktif';
+                    statusText.className = 'badge bg-secondary fs-6';
+                    startButton.disabled = false;
+                    stopButton.disabled = true;
+                }
+            });
+    }
+
+    startButton.addEventListener('click', function () {
+        fetch("{{ url_for('main.start_absen') }}", { method: 'POST' }).then(() => updateStatus());
+    });
+
+    stopButton.addEventListener('click', function () {
+        fetch("{{ url_for('main.stop_absen') }}", { method: 'POST' }).then(() => updateStatus());
+    });
+    
+    updateStatus();
+    setInterval(updateStatus, 5000);
+});
+</script>
+{% endblock %}

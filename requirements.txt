@@ -1,0 +1,14 @@
+Flask
+Flask-SQLAlchemy
+Flask-Migrate
+Flask-Login
+Flask-WTF
+wtforms-sqlalchemy
+opencv-python
+dlib
+face_recognition
+numpy
+openpyxl
+requests
+python-dotenv
+gunicorn
