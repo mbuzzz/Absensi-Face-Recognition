@@ -33,29 +33,29 @@
                     <i class="bi bi-camera-video"></i>Live Absen
                 </a>
                 
+                {# --- MENU BARU TANPA DROPDOWN --- #}
+
                 {% if current_user.is_authenticated and current_user.role in ['Admin', 'Wali Kelas', 'BK'] %}
-                <div class="list-group-item sidebar-dropdown dropdown">
-                    <a href="#" class="dropdown-toggle text-decoration-none" data-bs-toggle="dropdown">
-                        <i class="bi bi-journal-check"></i>Laporan
-                    </a>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="{{ url_for('main.edit_kehadiran_harian') }}">Edit Kehadiran Harian</a>
-                        <a class="dropdown-item" href="{{ url_for('main.laporan_log') }}">Log Jangka Waktu</a>
-                    </div>
-                </div>
+                <hr class="mx-3 my-1" style="border-color: rgba(0,0,0,0.05);">
+                <a href="{{ url_for('main.edit_kehadiran_harian') }}" class="list-group-item list-group-item-action">
+                    <i class="bi bi-calendar-check"></i>Edit Kehadiran
+                </a>
+                <a href="{{ url_for('main.laporan_log') }}" class="list-group-item list-group-item-action">
+                    <i class="bi bi-file-earmark-text"></i>Log Laporan
+                </a>
                 {% endif %}
 
                 {% if current_user.is_authenticated and current_user.role == 'Admin' %}
-                <div class="list-group-item sidebar-dropdown dropdown">
-                    <a href="#" class="dropdown-toggle text-decoration-none" data-bs-toggle="dropdown">
-                        <i class="bi bi-database-fill-gear"></i>Manajemen Data
-                    </a>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="{{ url_for('main.crud_siswa') }}">Siswa</a>
-                        <a class="dropdown-item" href="{{ url_for('main.crud_kelas') }}">Kelas</a>
-                        <a class="dropdown-item" href="{{ url_for('main.crud_user') }}">Pengguna</a>
-                    </div>
-                </div>
+                <hr class="mx-3 my-1" style="border-color: rgba(0,0,0,0.05);">
+                <a href="{{ url_for('main.crud_siswa') }}" class="list-group-item list-group-item-action">
+                    <i class="bi bi-people-fill"></i>Manajemen Siswa
+                </a>
+                <a href="{{ url_for('main.crud_kelas') }}" class="list-group-item list-group-item-action">
+                    <i class="bi bi-collection-fill"></i>Manajemen Kelas
+                </a>
+                <a href="{{ url_for('main.crud_user') }}" class="list-group-item list-group-item-action">
+                    <i class="bi bi-person-fill-gear"></i>Manajemen Pengguna
+                </a>
                 <a href="{{ url_for('main.pengaturan') }}" class="list-group-item list-group-item-action">
                     <i class="bi bi-sliders"></i>Pengaturan
                 </a>
@@ -73,6 +73,7 @@
             <nav class="navbar navbar-expand-lg navbar-light topbar">
                 <div class="container-fluid">
                     <button class="btn btn-link" id="sidebarToggle"><i class="bi bi-list"></i></button>
+
                     <ul class="navbar-nav ms-auto">
                         {% if current_user.is_authenticated %}
                         <li class="nav-item dropdown">

@@ -84,7 +84,7 @@ def set_setting(key, value):
     db.session.commit()
 
 def catat_absensi(siswa_id):
-    """Mencatat absensi dengan logika Terlambat."""
+    """Mencatat absensi dan mengembalikan status apakah catatan baru dibuat."""
     with current_app.app_context():
         today = datetime.utcnow().date()
         absen_hari_ini = Absensi.query.filter(Absensi.siswa_id == siswa_id, db.func.date(Absensi.timestamp) == today).first()
@@ -100,10 +100,17 @@ def catat_absensi(siswa_id):
     return False
 
 def kirim_notifikasi_n8n(absen_obj):
-    """Mengirim notifikasi ke n8n melalui webhook."""
+    """Mengirim notifikasi ke n8n melalui webhook dengan log yang lebih baik."""
     webhook_url = current_app.config.get('N8N_WEBHOOK_URL')
-    if not webhook_url: return
+    if not webhook_url:
+        print("Peringatan: N8N_WEBHOOK_URL tidak diatur. Notifikasi tidak dikirim.")
+        return
+
     siswa = absen_obj.siswa
+    if not siswa:
+        print(f"Error: Tidak dapat menemukan data siswa untuk Absensi ID: {absen_obj.id}")
+        return
+
     payload = {
         'nis': siswa.nis, 'nama': siswa.nama, 'kelas': siswa.kelas.nama_kelas,
         'nomor_orang_tua': siswa.nomor_orang_tua, 'status': absen_obj.status,
@@ -112,10 +119,16 @@ def kirim_notifikasi_n8n(absen_obj):
         'waktu_absen_lokal': (absen_obj.timestamp + timedelta(hours=7)).strftime('%d-%m-%Y %H:%M:%S')
     }
     try:
-        requests.post(webhook_url, json=payload, timeout=10)
-        print(f"Notifikasi untuk {siswa.nama} ({absen_obj.status}) berhasil dikirim ke n8n.")
+        print(f"Mengirim data ke n8n: {payload}")
+        response = requests.post(webhook_url, json=payload, timeout=10)
+        print(f"n8n response status: {response.status_code}")
+        print(f"n8n response body: {response.text}")
+        if response.status_code == 200:
+            print(f"Notifikasi untuk {siswa.nama} ({absen_obj.status}) berhasil dikirim ke n8n.")
+        else:
+            print(f"Gagal mengirim notifikasi ke n8n. Status: {response.status_code}")
     except requests.exceptions.RequestException as e:
-        print(f"Gagal mengirim notifikasi ke n8n: {e}")
+        print(f"Gagal mengirim notifikasi ke n8n (Request Exception): {e}")
 
 # --- Helper untuk Pengaturan & Context Processor ---
 @bp.context_processor
@@ -156,7 +169,8 @@ def gen_frames():
     last_face_locations, last_face_names, last_face_ids = [], [], []
     frame_count = 0
     PROCESS_EVERY_N_FRAMES = 5
-    recently_recorded = {}
+    RESIZE_FACTOR = 0.25
+    recently_recorded = {} # Menyimpan ID siswa yang baru saja tercatat
 
     try:
         while True:
@@ -165,7 +179,7 @@ def gen_frames():
                 if not success: break
 
                 if frame_count % PROCESS_EVERY_N_FRAMES == 0:
-                    small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+                    small_frame = cv2.resize(frame, (0, 0), fx=RESIZE_FACTOR, fy=RESIZE_FACTOR)
                     rgb_small_frame = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
                     
                     current_face_locations = face_recognition.face_locations(rgb_small_frame)
@@ -182,7 +196,7 @@ def gen_frames():
                             name, kelas_info = siswa_data_cache.get(siswa_id, ("Siswa Dihapus", ""))
                             if auto_absen_aktif:
                                 if catat_absensi(siswa_id):
-                                    recently_recorded[siswa_id] = time.time()
+                                    recently_recorded[siswa_id] = time.time() # Tandai waktu pencatatan
                         
                         current_face_names.append(f"{name} ({kelas_info})")
                         current_face_ids.append(siswa_id)
@@ -192,13 +206,16 @@ def gen_frames():
                 frame_count += 1
 
                 for (top, right, bottom, left), name, siswa_id in zip(last_face_locations, last_face_names, last_face_ids):
-                    top *= 4; right *= 4; bottom *= 4; left *= 4
+                    top = int(top / RESIZE_FACTOR)
+                    right = int(right / RESIZE_FACTOR)
+                    bottom = int(bottom / RESIZE_FACTOR)
+                    left = int(left / RESIZE_FACTOR)
                     
-                    color = (255, 0, 0)
+                    color = (255, 0, 0) # Merah untuk tidak dikenal
                     if siswa_id in recently_recorded and time.time() - recently_recorded[siswa_id] < 3:
-                        color = (0, 255, 0)
+                        color = (0, 255, 0) # Hijau terang untuk berhasil tercatat
                     elif siswa_id is not None:
-                        color = (0, 180, 216)
+                        color = (0, 180, 216) # Biru untuk sudah dikenali/sudah absen
 
                     cv2.rectangle(frame, (left, top), (right, bottom), color, 2)
                     cv2.rectangle(frame, (left, bottom - 35), (right, bottom), color, cv2.FILLED)
@@ -484,7 +501,7 @@ def edit_kehadiran_harian():
     if tanggal_laporan == datetime.utcnow().date() and datetime.now().time() > batas_alpha:
         siswa_belum_absen = [s for s in semua_siswa if s.id not in absensi_tercatat]
         for siswa in siswa_belum_absen:
-            alpha_record = Absensi(siswa_id=siswa.id, status='Alpha', keterangan='Dibuat otomatis oleh sistem', timestamp=datetime.combine(tanggal_laporan, batas_alpha))
+            alpha_record = Absensi(siswa_id=siswa.id, status='Alpha', keterangan='Dibuat otomatis oleh sistem', timestamp=datetime.combine(tanggal_laporan, batas_alpha), siswa=siswa)
             db.session.add(alpha_record); kirim_notifikasi_n8n(alpha_record)
         if siswa_belum_absen:
             db.session.commit()

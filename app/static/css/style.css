@@ -143,6 +143,45 @@ body {
     padding: 1rem 0;
 }
 
+/* --- Form (PERBAIKAN) --- */
+.form-label {
+    font-weight: 500;
+    color: #3a3b45; /* Warna teks gelap agar terlihat di latar belakang terang */
+    margin-bottom: 0.5rem;
+}
+
+.form-control, .form-select {
+    border-radius: 0.35rem;
+    color: #6e707e;
+    border-color: #d1d3e2;
+    background-color: #ffffff; /* Pastikan latar belakang input putih */
+}
+
+.form-control:focus, .form-select:focus {
+    color: #495057;
+    background-color: #fff;
+    border-color: #8c9fde;
+    box-shadow: 0 0 0 0.25rem rgba(78, 115, 223, 0.25);
+}
+
+/* --- Tabel --- */
+.table {
+    --bs-table-bg: #ffffff;
+    --bs-table-striped-bg: #f8f9fc;
+    color: var(--text-dark); /* Menggunakan warna teks utama */
+}
+
+.table th {
+    background-color: #eaecf4;
+    font-weight: 600;
+    color: #5a5c69;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+
 /* --- Media Queries untuk Responsivitas --- */
 @media (max-width: 768px) {
     #sidebar-wrapper {
