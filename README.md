@@ -2,7 +2,6 @@ Aplikasi Absensi Wajah Real-Time
 
 Aplikasi web modern berbasis Python Flask untuk sistem absensi sekolah. Menggunakan teknologi pengenalan wajah secara real-time untuk mencatat kehadiran siswa secara otomatis, dilengkapi dengan dashboard admin yang interaktif, manajemen data yang lengkap, dan sistem pelaporan yang canggih.
 
-(Disarankan untuk mengganti URL ini dengan screenshot dashboard aplikasi Anda)
 Fitur Utama
 
     Live Absensi: Kamera real-time untuk proses absensi dengan deteksi multi-wajah dan umpan balik visual saat absensi berhasil.
