@@ -1,8 +1,19 @@
-Aplikasi Absensi Wajah Real-Time
+<div align="center">
+<img src="https://placehold.co/150x150/4e73df/FFFFFF?text=Logo" alt="Logo Aplikasi" width="120">
+<h1>Aplikasi Absensi Wajah Real-Time</h1>
+<p>
+Aplikasi web modern berbasis Python Flask untuk sistem absensi sekolah yang cerdas dan otomatis.
+</p>
+<p>
+<img src="https://img.shields.io/badge/Python-3.8%2B-blue?style=for-the-badge&logo=python" alt="Python Version">
+<img src="https://img.shields.io/badge/Flask-2.x-black?style=for-the-badge&logo=flask" alt="Flask Version">
+<img src="https://img.shields.io/badge/OpenCV-4.x-blue?style=for-the-badge&logo=opencv" alt="OpenCV Version">
+<img src="https://img.shields.io/badge/Bootstrap-5.3-purple?style=for-the-badge&logo=bootstrap" alt="Bootstrap Version">
+</p>
+</div>
 
-Aplikasi web modern berbasis Python Flask untuk sistem absensi sekolah. Menggunakan teknologi pengenalan wajah secara real-time untuk mencatat kehadiran siswa secara otomatis, dilengkapi dengan dashboard admin yang interaktif, manajemen data yang lengkap, dan sistem pelaporan yang canggih.
-
-Fitur Utama
+Aplikasi ini menggunakan teknologi pengenalan wajah secara real-time untuk mencatat kehadiran siswa secara otomatis, dilengkapi dengan dashboard admin yang interaktif, manajemen data yang lengkap, dan sistem pelaporan yang canggih.
+✨ Fitur Utama
 
     Live Absensi: Kamera real-time untuk proses absensi dengan deteksi multi-wajah dan umpan balik visual saat absensi berhasil.
 
@@ -34,7 +45,7 @@ Fitur Utama
 
     Integrasi Notifikasi: Siap terhubung dengan n8n untuk notifikasi ke Telegram, WhatsApp (via WAHA), atau platform lainnya.
 
-Teknologi yang Digunakan
+🛠️ Teknologi yang Digunakan
 
     Backend: Python, Flask
 
@@ -46,7 +57,7 @@ Teknologi yang Digunakan
 
     Deployment: Siap dijalankan dengan Gunicorn untuk lingkungan produksi.
 
-Panduan Instalasi & Setup
+🚀 Panduan Instalasi & Setup
 
 Ikuti langkah-langkah berikut untuk menjalankan proyek ini di lingkungan lokal Anda.
 1. Prasyarat
@@ -72,7 +83,6 @@ Buka terminal atau command prompt, lalu clone repository ini:
 git clone https://github.com/mbuzzz/Absensi-Face-Recognition.git
 cd Absensi-Face-Recognition
 
-(Ganti username/nama-repo dengan URL repository GitHub Anda)
 3. Buat Virtual Environment
 
 Sangat disarankan untuk menggunakan virtual environment agar tidak mengganggu instalasi Python global Anda.
@@ -80,19 +90,28 @@ Sangat disarankan untuk menggunakan virtual environment agar tidak mengganggu in
 # Membuat environment baru bernama 'venv'
 python -m venv venv
 
-# Mengaktifkan environment
-# Di Windows:
+4. Aktifkan Virtual Environment
+
+# Di Windows (Command Prompt):
 venv\Scripts\activate
+
 # Di macOS / Linux:
 source venv/bin/activate
 
-4. Install Ketergantungan
+    ⚠️ Catatan untuk Pengguna Windows PowerShell
+    Jika Anda menggunakan PowerShell dan mendapatkan error seperti ...cannot be loaded because running scripts is disabled on this system, jalankan perintah berikut terlebih dahulu untuk mengizinkan eksekusi skrip hanya untuk sesi terminal saat ini. Ini adalah langkah yang aman.
 
-Install semua library Python yang dibutuhkan dari file requirements.txt dengan satu perintah:
+    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+
+    Setelah itu, jalankan kembali perintah venv\Scripts\activate.
+
+5. Install Ketergantungan
+
+Setelah virtual environment aktif, install semua library yang dibutuhkan dengan satu perintah:
 
 pip install -r requirements.txt
 
-5. Konfigurasi Environment (.env)
+6. Konfigurasi Environment (.env)
 
 Buat file baru bernama .env di direktori utama proyek. Salin konten di bawah ini ke dalam file tersebut dan sesuaikan nilainya.
 
@@ -105,7 +124,7 @@ DATABASE_URI='sqlite:///app.db'
 # (Opsional) URL Webhook dari n8n untuk notifikasi
 N8N_WEBHOOK_URL='https://url-n8n-anda/webhook/...'
 
-6. Setup Database
+7. Setup Database
 
 Jalankan perintah berikut secara berurutan untuk membuat database dan semua tabelnya.
 
@@ -119,7 +138,7 @@ flask db migrate -m "Initial database migration"
 flask db upgrade
 
 Catatan: Jika Anda mengubah model di app/models.py di kemudian hari, cukup jalankan langkah 2 dan 3 lagi untuk memperbarui database.
-7. Buat User Admin Pertama
+8. Buat User Admin Pertama
 
 Untuk bisa login dan mengelola aplikasi, Anda harus membuat satu akun Admin terlebih dahulu. Ini dilakukan melalui shell interaktif Flask.
 
@@ -155,7 +174,7 @@ else:
 Langkah 3: Keluar dari Shell
 
 Setelah melihat pesan konfirmasi, ketik exit() dan tekan Enter untuk keluar.
-8. Jalankan Aplikasi
+9. Jalankan Aplikasi
 
 Sekarang aplikasi Anda siap dijalankan!
 
@@ -164,4 +183,4 @@ python run.py
 Buka browser Anda dan akses alamat http://127.0.0.1:5000.
 Kredit
 
-Dibuat dengan ❤️ oleh Rifqy Iza Fahrizal
+Dibuat dengan ❤️ oleh Rifqy Iza Fahrizal dan Yanuar.
