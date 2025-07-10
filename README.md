@@ -57,9 +57,9 @@ Aplikasi ini menggunakan teknologi pengenalan wajah secara real-time untuk menca
 
     Deployment: Siap dijalankan dengan Gunicorn untuk lingkungan produksi.
 
-🚀 Panduan Instalasi & Setup
+🚀 Panduan Instalasi & Setup Lokal
 
-Ikuti langkah-langkah berikut untuk menjalankan proyek ini di lingkungan lokal Anda.
+Ikuti langkah-langkah berikut untuk menjalankan proyek ini di lingkungan lokal Anda untuk pengembangan dan pengujian.
 1. Prasyarat
 
 Pastikan perangkat Anda telah terinstal:
@@ -181,6 +181,121 @@ Sekarang aplikasi Anda siap dijalankan!
 python run.py
 
 Buka browser Anda dan akses alamat http://127.0.0.1:5000.
+🌐 Panduan Deployment ke Produksi (VPS)
+
+Setelah aplikasi berjalan dengan baik di lokal, ikuti panduan ini untuk men-deploy aplikasi ke VPS (diasumsikan menggunakan Ubuntu) agar bisa diakses secara publik.
+1. Persiapan Proyek
+
+Pastikan gunicorn sudah ada di dalam file requirements.txt Anda. Jika belum, tambahkan.
+2. Setup Awal Server (VPS)
+
+Login ke VPS Anda melalui SSH dan jalankan perintah berikut:
+
+# Update dan upgrade paket sistem
+sudo apt update && sudo apt upgrade -y
+
+# Install Nginx, Python, dan venv
+sudo apt install nginx python3-pip python3-venv -y
+
+3. Pindahkan Proyek ke VPS
+
+Cara terbaik adalah menggunakan git. Unggah proyek Anda ke repository (misalnya GitHub), lalu clone di VPS.
+
+# Clone repository Anda di direktori home
+cd ~
+git clone https://github.com/mbuzzz/Absensi-Face-Recognition.git
+cd Absensi-Face-Recognition
+
+4. Setup Aplikasi di VPS
+
+# Buat dan aktifkan virtual environment
+python3 -m venv venv
+source venv/bin/activate
+
+# Install semua dependensi
+pip install -r requirements.txt
+
+# Buat file .env untuk produksi
+nano .env
+# Isi file .env dengan konfigurasi produksi Anda (terutama SECRET_KEY)
+
+# Terapkan migrasi database
+flask db upgrade
+
+5. Uji Coba Gunicorn
+
+Jalankan Gunicorn secara manual untuk memastikan aplikasi bisa berjalan.
+
+# Ganti 'run:app' jika nama file utama atau objek aplikasi Anda berbeda
+gunicorn --workers 4 --bind 127.0.0.1:8000 run:app
+
+Jika tidak ada error, hentikan dengan Ctrl+C.
+6. Buat Service systemd untuk Gunicorn
+
+Ini akan membuat aplikasi Anda berjalan otomatis di background.
+
+sudo nano /etc/systemd/system/absensi.service
+
+Salin dan tempel konfigurasi di bawah ini. Ganti nama_user_anda dengan username Anda di VPS.
+
+[Unit]
+Description=Gunicorn instance to serve absensi app
+After=network.target
+
+[Service]
+User=nama_user_anda
+Group=www-data
+WorkingDirectory=/home/nama_user_anda/Absensi-Face-Recognition
+ExecStart=/home/nama_user_anda/Absensi-Face-Recognition/venv/bin/gunicorn --workers 4 --bind 127.0.0.1:8000 run:app
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
+Aktifkan dan mulai service:
+
+sudo systemctl start absensi
+sudo systemctl enable absensi
+sudo systemctl status absensi
+
+7. Konfigurasi Nginx sebagai Reverse Proxy
+
+Nginx akan menerima trafik dari internet dan meneruskannya ke Gunicorn.
+
+sudo nano /etc/nginx/sites-available/absensi
+
+Salin dan tempel konfigurasi ini. Ganti domain_anda.com dengan nama domain atau alamat IP VPS Anda.
+
+server {
+    listen 80;
+    server_name domain_anda.com www.domain_anda.com;
+
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /static {
+        alias /home/nama_user_anda/Absensi-Face-Recognition/app/static;
+    }
+}
+
+Aktifkan site dan restart Nginx:
+
+sudo ln -s /etc/nginx/sites-available/absensi /etc/nginx/sites-enabled
+sudo nginx -t
+sudo systemctl restart nginx
+
+8. Konfigurasi Firewall
+
+Izinkan trafik web melalui firewall:
+
+sudo ufw allow 'Nginx Full'
+
+Selesai! Aplikasi Anda sekarang seharusnya sudah bisa diakses melalui domain atau alamat IP VPS Anda.
 Kredit
 
 Dibuat dengan ❤️ oleh Rifqy Iza Fahrizal dan Yanuar.
